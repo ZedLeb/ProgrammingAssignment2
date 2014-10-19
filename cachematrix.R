@@ -1,71 +1,74 @@
-##The code below based on example given in the instructions for
-##Programming Assignment 2: Lexical Scoping
-
-
-##This function creates a special "matrix" object that can 
-##cache the inverse of an invertible matrix.
+## The code below based on example given in the instructions for
+## Programming Assignment 2: Lexical Scoping
+## The script contains a pair of functions that cache the inverse
+## of an invertible matrix.
 
 makeCacheMatrix <- function(x = matrix()) {
+        ## This function creates a special "matrix" object that can 
+        ## cache the inverse of an invertible matrix.
         
-        # set variable i (the inverse) to NULL
-        i <- NULL  
+        # Variable for the cached value of the inverse of x
+        inv <- NULL  
         
-        # use super-assignment operator <<- to set the x and 
-        # i variables to the enclosing environment.
-        set <- function(y) {
-                x <<- y
-                i <<- NULL
+        # Function to set the replacement matrix
+        set <- function(newx) {
+                # note super-assignment operator used to set the x and 
+                # i variables to the enclosing environment.
+                x <<- newx
+                inv <<- NULL
         }
         
-        # return the value of x
-        get <- function() x
+        # Function to return the matrix x
+        get <- function() {
+                # Return the matrix
+                x
+        }
         
-        # set i in the local funtion (the argument inverse)
-        # to the value of i found in the enclosing environment
-        # superassign i to the enclosing environment
-        ## NOTE: I don't understand why or how setinverse runs
-        ## before i is superassigned...
-        setinverse <- function(inverse) i <<- inverse
         
-        # return the value of i
-        getinverse <- function() i
+        # Function to store the supplied inverse of the matrix
+        setinverse <- function(newinv) {
+                inv <<- newinv
+        }
+       
         
-        # create a list vector of functions with names
+        # Function that returns the cached inverse of x
+        getinverse <- function() {
+                # Return the inverse
+                inv
+        }
+        
+        # Return a list of all functions with names
         list(set = set, get = get,
              setinverse = setinverse,
              getinverse = getinverse)
 }
 
 
-##This function computes the inverse of makeCacheMatrix.
-##If the inverse has already been calculated (and the matrix has not 
-##changed), then the cacheSolve() should retrieve the inverse from the cache.
-
 cacheSolve <- function(x, ...) {
+        ##This function computes the inverse of makeCacheMatrix.
+        ##If the inverse has already been calculated (and the matrix has not 
+        ##changed), then the cacheSolve() should retrieve the inverse from the cache.
         
-        # call getinverse() from makeCacheMatrix and
-        # assign to i 
-        i <- x$getinverse()
+        # Return a matrix that is the inverse of 'x'
+        inv <- x$getinverse()
         
-        # if() checks that i is NOT null and prints message that
-        # cached data will be used
-        # return the cached inverse
-        if(!is.null(i)) {
+        #If the inverse has already been computed, use that.
+        if(!is.null(inv)) {
                 message("getting cached data")
-                return(i)
+                return(inv)
         }
         
-        # else (as i IS null) call get() from makeCacheMatrix
-        # and assign the value to data
+        # else (as inv IS null) call get() from makeCacheMatrix
+        # and assign the matrix to data
         data <- x$get()
         
-        # calculate the inverse of data with solve() function 
-        i <- solve(data, ...)
+        # Compute the inverse of data using matrix multiplication
+        inv <- solve(data, ...)
         
         # call setinverse() from makeCacheMatrix and
         # pass the newly created inverse
-        x$setinverse(i) 
+        x$setinverse(inv) 
         
         ## return the newly created inverse
-        i
+        inv
 }
